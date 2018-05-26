@@ -2,6 +2,9 @@ const mongoose = require('mongoose')
 const {generateToken} = require("../../helpers/utils")
 
 const dispatcherSchema = mongoose.Schema({
+    network: {
+        type: String,
+    },
     pub: {
         type: String,
         required: true,
@@ -55,6 +58,7 @@ const Dispatcher = {
         return dispatcher
     },
     async dispatchers(){
+        //TODO: return dispatchers that aern't in a network
         const dispatchers = await DispatcherModel.find({active: true}, {addr: 1, workers: 1}).sort({workers: 1}).limit(10)
         return dispatchers
     },
@@ -74,15 +78,27 @@ const Dispatcher = {
         await DispatcherModel.findOneAndRemove({pub})
     },
     async count(){
-        count = DispatcherModel.count()
+        const count = await DispatcherModel.count()
         return count
     },
     async awake(){
-        count = DispatcherModel.count({active: true})
+        const count = await DispatcherModel.count({active: true})
         return count
     },
     async asleep(){
-        count = DispatcherModel.count({active: false})
+        const count = await DispatcherModel.count({active: false})
+        return count
+    },
+    async countNetwork(network){
+        const count = await DispatcherModel.count({network})
+        return count
+    },
+    async awakeNetwork(network){
+        const count = DispatcherModel.count({active: true, network})
+        return count
+    },
+    async asleepNetwork(network){
+        const count = DispatcherModel.count({active: false, network})
         return count
     }
 }
